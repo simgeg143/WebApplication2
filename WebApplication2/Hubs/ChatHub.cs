@@ -4,9 +4,11 @@ namespace WebApplication2.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task SendMessage (string user, string message)
+        public async Task SendMessage (string message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            var user = Context.User?.Identity?.Name ?? "Anonymous";
+            var sentAt = DateTime.Now.ToString("HH:mm:ss");
+            await Clients.All.SendAsync("ReceiveMessage", user, message, sentAt);
         }
     }
 }
