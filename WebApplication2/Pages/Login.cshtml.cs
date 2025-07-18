@@ -11,6 +11,11 @@ namespace WebApplication2.Pages
         public void OnGet() { }
             public async Task<IActionResult> OnPostAsync(string username)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                ModelState.AddModelError("", "Username cannot be empty.");
+                return Page();
+            }
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username)

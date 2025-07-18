@@ -11,7 +11,7 @@
 <div class="container">
     <div class="row p-1">
         <div class="col-1">User</div>
-        <div class="col-5"><input type="text" value="@User.Identity.Name" readonly/></div>
+        <div class="col-5"><input type="text" id="userInput" value="@User.Identity.Name" readonly/></div>
     </div>
     <div style="display:flex"; justify-content: space-between; align-items:center; max-width: 600px; margin-bottom: 15px;">
         <form method="get" action="/Logout">
@@ -20,11 +20,11 @@
     </div>
     <div class="row p-1">
         <div class="col-1">Message</div>
-        <div class="col-5"><input type="text" class="w-100" id="messageInput"/></div>
+        <div class="col-5"><textarea class="w-100" id="messageInput" rows="2" style="resize: none;"></textarea></div>
      </div>
      <div class="row p-1">
          <div class="col-6" text-end>
-                <input type="button" id="sendButton" value="Send Message"/>
+                <input type="button" id="sendButton" value="Send Message" disabled/>
          </div>         
      </div>
      <div class="row p-1">
@@ -34,9 +34,37 @@
             </div>
         <div class="row p-1">
             <div class="col-6">
-                <ul id="messagesList"></ul>
+                <ul id="messagesList" style="max-height: 300px; overflow-y:auto"></ul>
             </div>
             </div>
+
+            <style>
+               .message {
+                    padding: 10px;
+                    margin: 5px;
+                    border-radius: 10px;
+                    max-width: 60%;
+                    word-wrap: break-word;
+                    display: block;
+                }
+                .message-left {
+                    background-color: #f1f0f0;
+                    text-align: left;
+                    margin-right: auto;
+            }
+                .message-right {
+                    background-color: #cce5ff;
+                    text-align: right;
+                    margin-left: auto;
+                }
+                .message-time {
+                    font-size: 0.75rem;
+                    color: gray;
+                    margin-top: 5px;
+                }
+            </style>
 </div>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
+
+

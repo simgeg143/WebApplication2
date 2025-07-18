@@ -6,7 +6,30 @@
 
 <h2>Login</h2>
 
-<form method="post">
-    <input type="text" name="username" placeholder="Username" required />
+<form  id="loginForm" method="post" >
+    <input type="text" id="username" name="username" placeholder="Username" />
     <button type="submit">Log in</button>
 </form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("loginForm").addEventListener("submit",function(e){
+        var username = document.getElementById("username").value.trim();
+
+        if (username == ""){
+        e.preventDefault();
+        alert("Username cannot be empty.");
+        }
+    });
+    });
+</script>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}

@@ -7,7 +7,7 @@ namespace WebApplication2.Hubs
         public async Task SendMessage (string message)
         {
             var user = Context.User?.Identity?.Name ?? "Anonymous";
-            var sentAt = DateTime.Now.ToString("HH:mm:ss");
+            var sentAt = DateTime.Now.ToString("HH:mm");
             await Clients.All.SendAsync("ReceiveMessage", user, message, sentAt);
         }
     }
