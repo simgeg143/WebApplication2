@@ -8,6 +8,7 @@
 
 <form  id="loginForm" method="post" >
     <input type="text" id="username" name="username" placeholder="Username" />
+    <input type="password" id="password" name="password" placeholder="Password" />
     <button type="submit">Log in</button>
 </form>
 
@@ -15,6 +16,7 @@
     document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("loginForm").addEventListener("submit",function(e){
         var username = document.getElementById("username").value.trim();
+        var password = document.getElementById("password").value.trim();
 
         if (username == ""){
         e.preventDefault();
@@ -23,6 +25,9 @@
     });
     });
 </script>
+
+<p>Don't have an account? <a href="/Register">Register here</a></p>
+
 
 @if (!ViewData.ModelState.IsValid)
 {

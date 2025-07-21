@@ -2,69 +2,71 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-const userInput = document.getElementById("userInput");
-const messageInput = document.getElementById("messageInput");
-const sendButton = document.getElementById("sendButton");
+document.getElementById("sendButton").disabled = true;
 
+// Dropdown veya mesaj yazıldığında butonu aktif et
+document.getElementById("receiverInput").addEventListener("change", toggleSendButton);
+document.getElementById("messageInput").addEventListener("input", toggleSendButton);
 
-function validateInputs() {
-    const user = userInput.value.trim();
-    const message = messageInput.value.trim();
+function toggleSendButton() {
+    const receiver = document.getElementById("receiverInput").value;
+    const message = document.getElementById("messageInput").value.trim();
 
-    if (user && message) {
-        sendButton.disabled = false;        
-    } else {
-        sendButton.disabled = true;
-    }
+    document.getElementById("sendButton").disabled = (receiver === "" || message === "");
 }
 
-messageInput.addEventListener("input", validateInputs);
+// Mesaj gönder
+document.getElementById("sendButton").addEventListener("click", function (event) {
+    const receiver = document.getElementById("receiverInput").value;
+    const message = document.getElementById("messageInput").value;
 
-window.addEventListener("DOMContentLoaded", validateInputs);
-
-connection.start().then(function () {
-    console.log("SignalR connection is successfull.");
-    validateInputs();
-}).catch(function (err) {
-    console.error("Connection error:", err.toString());
-});
-
-sendButton.addEventListener("click", function (event) {
-    const user = userInput.value.trim();
-    const message = messageInput.value.trim();
-
-
-    connection.invoke("SendMessage", message).catch(function (err) {
+    connection.invoke("SendMessageToUser", receiver, message).catch(function (err) {
+        return console.error(err.toString());
     });
 
-    messageInput.value = "";
-    validateInputs();
+    document.getElementById("messageInput").value = "";
+    toggleSendButton(); // mesaj kutusu boşalınca tekrar kontrol
     event.preventDefault();
 });
-messageInput.addEventListener("keypress", function (event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        const sendButton = document.getElementById("sendButton");
-        if (!sendButton.disabled) {
-            sendButton.click();
-        }
-    }
+
+// Gelen mesajı dinle
+connection.on("ReceivePrivateMessage", function (user, message, sentAt, receiverUsername) {
+    const currentUser = document.getElementById("userInput").value;
+    const isMe = user === currentUser;
+
+    const li = document.createElement("li");
+    li.classList.add("message");
+    li.classList.add(isMe ? "message-right" : "message-left");
+
+    li.innerHTML =
+        `<div class="message-sender">From ${user} To ${receiverUsername}:</div>
+        <div>${message}</div>
+        <div class="message-time">${sentAt}</div>`;
+
+    document.getElementById("messagesList").appendChild(li);
 });
 
-connection.on("ReceiveMessage", function (user, message, sentAt) {
+// Kullanıcı listesi güncellendiğinde dropdown'ı yenile
+connection.on("UserUpdated", function (userList) {
     const currentUser = document.getElementById("userInput").value;
+    const dropdown = document.getElementById("receiverInput");
 
-    const messageContainer = document.createElement("div");
-    messageContainer.classList.add("message");
+    // Mevcut seçenekleri temizle
+    dropdown.innerHTML = `<option value="">Select user</option>`;
 
-    if (user === currentUser) {
-        messageContainer.classList.add("message-right");
-    } else {
-        messageContainer.classList.add("message-left");
-    }
-    messageContainer.innerHTML = `<strong>${user}</strong>: ${message} <div class="message-time">${sentAt}</div>`;
-    document.getElementById("messagesList").appendChild(messageContainer);
+    userList.forEach(function (user) {
+        if (user.Username !== currentUser) {
+            const option = document.createElement("option");
+            option.value = user;
+            option.textContent = user;
+            dropdown.appendChild(option);
+        }
+    });
+});
 
-    const messagesList = document.getElementById("messagesList");
-    messagesList.scrollTop = messagesList.scrollHeight;
+connection.start().then(function () {
+    console.log("Connected to SignalR hub.");
+    toggleSendButton();
+}).catch(function (err) {
+    return console.error(err.toString());
 });

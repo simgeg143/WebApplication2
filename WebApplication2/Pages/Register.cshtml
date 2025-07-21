@@ -1,0 +1,40 @@
+﻿@page
+@model WebApplication2.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<form id="registerForm" method="post">
+    <input type="text" id="username" name="username" placeholder="Username" required />
+    <input type="password" id="password" name="password" placeholder="Password" required />
+    <input type="email" id="email" name="email" placeholder="Email" required />
+    <input type="datetime" id="birthday" name="birthday" placeholder="Birthday" required />
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("registerForm").addEventListener("submit", function(e) {
+            var username = document.getElementById("username").value.trim();
+            var password = document.getElementById("password").value.trim();
+            var email = document.getElementById("email").value.trim();
+            var birthday = document.getElementById("birthday").value.trim();
+            if (username === "" || password === "" || email === "" || birthday === "") {
+                e.preventDefault();
+                alert("All fields are required.");
+            }
+        });
+    });
+</script>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}

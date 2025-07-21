@@ -3,29 +3,51 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
+using WebApplication2.Data;
+using WebApplication2.Helpers;
+using WebApplication2.Models;
 
 namespace WebApplication2.Pages
 {
     public class LoginModel : PageModel
     {
-        public void OnGet() { }
-            public async Task<IActionResult> OnPostAsync(string username)
+        private readonly AppDbContext appDbContext;
+
+        public LoginModel(AppDbContext appDbContext)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            this.appDbContext = appDbContext;
+        }
+
+        [BindProperty]
+        public string Username { get; set; }
+        [BindProperty]
+        public string Password { get; set; }
+        public void OnGet() { }
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                ModelState.AddModelError("", "Username cannot be empty.");
+                ModelState.AddModelError("", "Username or password cannot be empty.");
                 return Page();
             }
-            var claims = new List<Claim>
+
+            var user = appDbContext.Users.FirstOrDefault(u => u.Username == Username);
+            if (user != null && PasswordHasher.VerifyPassword(Password, user.Password))
             {
-                new Claim(ClaimTypes.Name, username)
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username)
+        };
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            return RedirectToPage("/Index");
+
+                return RedirectToPage("/Index");
+            }
+            ModelState.AddModelError("", "Invalid username or password.");
+            return Page();
         }
     }
 }
