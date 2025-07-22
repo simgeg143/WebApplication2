@@ -1,6 +1,7 @@
 using WebApplication2.Hubs;
 using WebApplication2.Data;
 using Microsoft.EntityFrameworkCore;
+using WebApplication2.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,12 @@ builder.Services.AddAuthentication("Cookies")
         options.AccessDeniedPath = "/AccessDenied";
     });
 builder.Services.AddControllers();
-
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+    options.SlidingExpiration = false;
+    options.LoginPath = "/Login";
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

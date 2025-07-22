@@ -40,7 +40,7 @@ namespace WebApplication2.Hubs
             }
             return Task.CompletedTask;
         }
-        public async Task SendMessageToUser(string receiverUsername, string message)
+        public async Task SendPrivateMessageToUser(string receiverUsername, string message)
         {
             var sender = Context.User?.Identity?.Name;
             if (string.IsNullOrEmpty(sender) || string.IsNullOrEmpty(receiverUsername))

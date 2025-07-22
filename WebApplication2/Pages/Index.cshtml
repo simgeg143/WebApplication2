@@ -1,85 +1,178 @@
 ﻿@page
-@model IndexModel
+@model WebApplication2.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Chat";
 }
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-</div>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ChatApp</title>
+        <style>
+            body{
+            margin: 0;
+            font-family: Arial, sans-serif;
+            }
+            .sidebar{
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background-color: #2c3e50;
+            padding-top: 20px;
+            color: white;
+            }
 
-<div class="container">
-    <div class="row p-1">
-        <div class="col-1">User</div>
-        <div class="col-5"><input type="text" id="userInput" value="@User.Identity.Name" readonly/></div>
+            .sidebar a {
+                padding: 12px 20px;
+                text-decoration: none;
+                display: block;
+                color: white;
+                transition: background-color 0.3s;
+            }
+            .sidebar a:hover {
+                background-color: #34495e;
+                }
+                .content {
+            margin-left: 220px; 
+            padding: 20px;
+                }
+                .sidebar h2{
+            text-align: center;
+            margin-bottom:30px;
+                }
+
+        .message {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            max-width: 60%;
+            word-wrap: break-word;
+            display: block;
+        }
+
+        .message-left {
+            background-color: #f1f0f0;
+            text-align: left;
+            margin-right: auto;
+        }
+
+        .message-right {
+            background-color: #cce5ff;
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: gray;
+            margin-top: 5px;
+        }
+        </style>
+    </head>
+<body>
+    <div class="sidebar">
+    <h2>Chat App</h2>
+    <a href="/Chat">Home</a>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a href="/Logout">Logout</a>
+        <span style="display:block; padding: 10px; color:#ccc;">
+                Welcome, <strong>@User.Identity.Name!</strong>
+        </span>
+        <a href="/Index">Chat</a>
+    }
+    else
+    {
+            <a href="/Register">Register</a>
+            <a href="/Login">Login</a>
+    }
     </div>
-    <div style="display:flex"; justify-content: space-between; align-items:center; max-width: 600px; margin-bottom: 15px;">
-        <form method="get" action="/Logout">
-            <button type="submit">Log out</button>
+
+    <div class="content">
+    @if(User.Identity.IsAuthenticated)
+    {
+            <div class="row p-1">
+                <div class="col-1">User</div>
+                <div class="col-5"><input type="text" id="userInput" value="@User.Identity.Name" readonly /></div>
+            </div>
+            <div style="display:flex; justify-content: space-between; align-items:center; max-width: 600px; margin-bottom: 15px;">
+                <form method="get" action="/Logout">
+                    <button type="submit">Log out</button>
                 </form>
-    </div>
-    <div class="row p-1">
-        <div class="col-1">To:</div>
-        <div class="col-5">
-            <select class="form-select" id="receiverInput">
-            <option value="">Select user</option>
-            @foreach (var user in Model.Users)
-            {              
-                <option value="@user.Username">@user.Username</option>
-            }
-            </select>
+            </div>
+            <div class="row p-1">
+                <div class="col-1">To:</div>
+                <div class="col-5">
+                    <select class="form-select" id="receiverInput">
+                        <option value="">Select user</option>
+                        @foreach (var user in Model.Users)
+                        {
+                            <option value="@user.Username">@user.Username</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-1">Message</div>
+                <div class="col-5"><textarea class="w-100" id="messageInput" rows="2" style="resize: none;"></textarea></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-6">
+                    <label for="imageInput">Send Image:</label>
+                    <input type="file" id="imageInput" accept="image/*" />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-6 text-end">
+                    <input type="button" id="sendButton" value="Send Message" disabled />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-6">
+                    <hr />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-6">
+                    <ul id="messagesList" style="max-height: 300px; overflow-y:auto"></ul>
+                </div>
+            </div>
+        } else
+        {
+            <h1>Welcome to ChatApp</h1>
+            <p>Please <a href="/Login">log in</a> or <a href="/Register">register</a> to start chatting.</p>
+        }
         </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-1">Message</div>
-        <div class="col-5"><textarea class="w-100" id="messageInput" rows="2" style="resize: none;"></textarea></div>
-     </div>
-     <div class="row p-1">
-         <div class="col-6" text-end>
-                <input type="button" id="sendButton" value="Send Message" disabled/>
-         </div>         
-     </div>
-     <div class="row p-1">
-        <div class="col-6">
-           <hr />
-            </div>
-            </div>
-        <div class="row p-1">
-            <div class="col-6">
-                <ul id="messagesList" style="max-height: 300px; overflow-y:auto"></ul>
-            </div>
-            </div>
-
-            <style>
-               .message {
-                    padding: 10px;
-                    margin: 5px;
-                    border-radius: 10px;
-                    max-width: 60%;
-                    word-wrap: break-word;
-                    display: block;
-                }
-                .message-left {
-                    background-color: #f1f0f0;
-                    text-align: left;
-                    margin-right: auto;
-            }
-                .message-right {
-                    background-color: #cce5ff;
-                    text-align: right;
-                    margin-left: auto;
-                }
-                .message-time {
-                    font-size: 0.75rem;
-                    color: gray;
-                    margin-top: 5px;
-                }
-            </style>
-</div>
-
 
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
 
 
+<script>
+    let idleTime = 0;
+    const logoutAfterMinutes = 15;
+
+    setInterval(function()  {
+        idleTime++;
+        if (idleTime >= logoutAfterMinutes) {
+            console.log("Logging out...");
+            sessionStorage.clear();
+            window.location.href = '/Logout';
+        }
+    }, 60000);
+
+    window.onload = resetIdleTimer;
+    window.onmousemove = resetIdleTimer;
+    window.onkeypress = resetIdleTimer;
+    window.onclick = resetIdleTimer;
+    window.onscroll = resetIdleTimer;
+
+    function resetIdleTimer() {
+        idleTime = 0;        
+    }
+</script>
+
+</body>
+</html>

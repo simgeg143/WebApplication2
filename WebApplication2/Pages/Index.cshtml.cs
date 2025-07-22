@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication2.Data;
@@ -45,5 +46,6 @@ namespace WebApplication2.Pages
             public string Email { get; set; }
             public DateTime Birthday { get; set; }
         }
+
     }
 }
