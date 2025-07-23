@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApplication2.Pages
 {
-    public class ChatModel : PageModel
+    public class HomeModel : PageModel
     {
         public void OnGet()
         {

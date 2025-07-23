@@ -11,7 +11,7 @@ document.getElementById("imageInput").addEventListener("change", toggleSendButto
 function toggleSendButton() {
     const receiver = document.getElementById("receiverInput").value;
     const message = document.getElementById("messageInput").value.trim();
-    const file = document.getElementById("imageInput").files[0]; 
+    const file = document.getElementById("imageInput").files[0];
 
     const hasMessageOrImage = message !== "" || file;
     document.getElementById("sendButton").disabled = (receiver === "" || !hasMessageOrImage);
@@ -47,13 +47,13 @@ document.getElementById("sendButton").addEventListener("click", async function (
 
 
     const finalMessage = fullImageUrl ? `${message}<br> <img src='${fullImageUrl}' style="max-width: 200px; height: auto">` : message;
-    connection.invoke("SendPrivateMessageToUser",receiver, finalMessage).catch(function (err) {
+    connection.invoke("SendPrivateMessageToUser", receiver, finalMessage).catch(function (err) {
         return console.error(err.toString());
     });
 
     document.getElementById("messageInput").value = "";
     fileInput.value = ""; // Clear the file input
-    toggleSendButton(); 
+    toggleSendButton();
 });
 document.getElementById("messageInput").addEventListener("keypress", function (event) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -78,12 +78,14 @@ connection.on("ReceivePrivateMessage", function (user, message, sentAt, receiver
         <div>${message}</div>
         <div class="message-time">${sentAt}</div>`;
 
-    document.getElementById("messagesList").appendChild(li);
+    const chatMessagesDiv = document.querySelector(".chat-messages");
 
-    const messagesList = document.getElementById("messagesList");
-    messagesList.scrollTop = messagesList.scrollHeight; // Scroll to the bottom
+    chatMessagesDiv.appendChild(li);
+
+    requestAnimationFrame(() => {
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    });
 });
-
 connection.on("UserUpdated", function (userList) {
     const currentUser = document.getElementById("userInput").value;
     const dropdown = document.getElementById("receiverInput");

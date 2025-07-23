@@ -9,7 +9,7 @@ namespace WebApplication2.Pages
         public async Task OnGet()
         {
             await HttpContext.SignOutAsync("Cookies");
-            Response.Redirect("/Login");
+            Response.Redirect("/Home");
         }
     }
 }
