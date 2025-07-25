@@ -10,24 +10,9 @@
     <input type="text" id="username" name="username" placeholder="Username" required />
     <input type="password" id="password" name="password" placeholder="Password" required />
     <input type="email" id="email" name="email" placeholder="Email" required />
-    <input type="datetime" id="birthday" name="birthday" placeholder="Birthday" required />
+    <input type="date" id="birthday" name="birthday" placeholder="Birthday" required />
     <button type="submit">Register</button>
 </form>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("registerForm").addEventListener("submit", function(e) {
-            var username = document.getElementById("username").value.trim();
-            var password = document.getElementById("password").value.trim();
-            var email = document.getElementById("email").value.trim();
-            var birthday = document.getElementById("birthday").value.trim();
-            if (username === "" || password === "" || email === "" || birthday === "") {
-                e.preventDefault();
-                alert("All fields are required.");
-            }
-        });
-    });
-</script>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -38,3 +23,4 @@
         }
     </div>
 }
+<script src="~/js/validation.js"></script>
