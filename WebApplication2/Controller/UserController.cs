@@ -20,8 +20,7 @@ namespace WebApplication2.Controllers
             {
                 return Unauthorized("User is not authenticated.");
             }
-            var users = await _context.Users
-                .Where(u => u.Username != currentUsername)
+            var users = await _context.Users 
                 .Select(u => new
                 {
                     u.Id,

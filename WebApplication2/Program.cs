@@ -29,6 +29,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = false;
     options.LoginPath = "/Login";
 });
+
+builder.WebHost.UseUrls("http://0.0.0.0:5167", "https://0.0.0.0:7214");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

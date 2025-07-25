@@ -54,7 +54,16 @@
                 margin-bottom: 5px;
                 transition: background-color 0.2s;
             }
-
+            .sidebar a.chat-link{
+                display: block;
+                padding: 10px;
+                color: black;
+                text-decoration: none;
+                transition: background-color 0.2s ease;
+            }
+            .sidebar a.chat-link:hover{
+                background-color:#87cefa;
+            }
                 .sidebar a:hover {
                     background-color: #e9ecef;
                 }
@@ -68,11 +77,12 @@
             background-color: #f1f3f5; 
         }
         .chat-messages{
+            display: flex;
             flex-grow: 1;
             overflow-y:auto;
             padding-right: 10px;
             margin-bottom: 10px;
-            height: 200px;
+            height: 500px;
         }
         .chat-input{
             border-top: 1px solid #ccc;
@@ -111,29 +121,47 @@
     <div class="d-flex main-container">
         <div class="sidebar">
             <h2>Your Chats</h2>
+            @foreach (var user in Model.Users)
+            {
+                <a href="#" class="chat-link" data-username="@user.Username">@user.Username</a>             
+            }
         </div>
             
         <div class="content">
             @if (User.Identity.IsAuthenticated)
             {
-                <div class="chat-messages mb-3">
-                <div class="row p-1">
-                    <div class="col-6">
-                        <hr />
+                <div class="chat-messages mb-3 d-flex flex-column" style="height: 500px;">
+                    <div class="sending-to-bar p-1 align-items-center" style="flex: 0 0 auto; background-color: white; border-bottom: 1px solid #ccc;">
+                        <div class="row">
+                            <div class="col-auto">
+                                <strong>Sending to:</strong>
+                            </div>
+                            <div class="col-auto">
+                                <span id="selectedReceiverDisplay">None</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="messages-list-container flex-grow-1 overflow-auto" style="padding-right: 10px;">
+                        <ul id="messagesList" class="list-unstyled m-0" style="height: 100%;">
+                        @foreach(var msg in Model.ChatHistory)
+                        {
+                            var isMe = msg.SenderUsername == User.Identity.Name;
+                            <li class="message @(isMe ? "message-right" : "message-left")">
+                                <div>From @msg.SenderUsername to @msg.ReceiverUsername:</div>
+                                <div>@Html.Raw(msg.Content)</div>
+                                <div class="message-time">@msg.SentAt.ToString("HH:mm")</div>
+                            </li>
+                        }
+                        </ul>
                     </div>
                 </div>
-                <div class="row p-1">
-                    <div class="col-6">
-                            <ul id="messagesList" class="list-unstyled" style="height:100%; overflow-y:auto"></ul>
-                    </div>
-                </div>
-                </div>
+
                 <div class="chat-input bg-white p-3 rounded shadow-sm">
                 <div class="row p-1">
-                    <div class="col-1">User</div>
-                    <div class="col-5"><input type="text" id="userInput" value="@User.Identity.Name" readonly /></div>
+                    <div class="col-5"><input type="hidden" id="currentUsername" value="@User.Identity.Name"/></div>
                 </div>               
-                <div class="row p-1">
+                <div class="row p-1 d-none">
                     <div class="col-1">To:</div>
                     <div class="col-5">
                         <select class="form-select" id="receiverInput">
@@ -145,22 +173,22 @@
                         </select>
                     </div>
                 </div>
-                <div class="row p-1">
-                    <div class="col-1">Message</div>
-                    <div class="col-5"><textarea class="w-100" id="messageInput" rows="2" style="resize: none;"></textarea></div>
-                </div>
-                <div class="row p-1">
-                    <div class="col-6">
-                        <label for="imageInput">Send Image:</label>
-                        <input type="file" id="imageInput" accept="image/*" />
+                    <div class="d-flex justify-content-center mt-3">
+                        <div class="chat-input bg-white p-3 rounded shadow-sm" style="width: 100%; max-width: 800px;">
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;">
+
+                                <textarea id="messageInput" rows="2" placeholder="Type your message..." class="form-control" style="flex: 1; resize: none;"></textarea>
+
+                                <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 150px;">
+                                    <input type="file" id="fileInput" accept="file/*" class="form-control form-control-sm" />
+                                </div>
+
+                                <input type="button" id="sendButton" value="Send Message" class="btn btn-primary" disabled style="height: 38px;" />
+                            </div>
+                        </div>
                     </div>
+
                 </div>
-                <div class="row p-1">
-                    <div class="col-6 text-end">
-                        <input type="button" id="sendButton" value="Send Message" disabled />
-                    </div>
-                </div>
-              </div>
             }
             else
             {
@@ -195,6 +223,35 @@
             function resetIdleTimer() {
                 idleTime = 0;
             }
+        </script>        
+        <script>
+            document.addEventListener("DOMContentLoaded",function(){
+                const receiverInput = document.getElementById("receiverInput");
+                const messageInput = document.getElementById("messageInput");
+                const sendButton = document.getElementById("sendButton");
+
+                function toggleSendButton(){
+                    const hasReceiver = receiverInput.value.trim() !== "";
+                    const hasMessage = messageInput.value.trim() !== "";
+
+                    sendButton.disabled = !(hasReceiver && hasMessage);
+                }
+                receiverInput.addEventListener("change",toggleSendButton);
+                messageInput.addEventListener("input",toggleSendButton);
+                toggleSendButton();
+            });
+        </script>
+        <script>
+            const currentUser = "@User.Identity.Name";
+            document.getElementById("currentUsername").value = currentUser;
+        </script>
+        <script>
+            window.addEventListener('load', () => {
+                    const container = document.querySelector(".messages-list-container");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+            });
         </script>
 
 </body>
